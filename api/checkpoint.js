@@ -8,10 +8,10 @@
 // --- URLs Constantes (del Kit de Recursos PDF) ---
 
 // URL para obtener el token de acceso
-const TOKEN_URL = 'https://opengw.test.openxpand.com/auth/realms/telecom/protocol/openid-connect/token';
+const TOKEN_URL = 'https://access-checkpoint.free.beeceptor.com';
 
 // URL base para llamar a las APIs
-const API_BASE_URL = 'https://api.test.openxpand.com/api/camara/telecom/sandbox/';
+const API_BASE_URL = 'https://access-checkpoint.free.beeceptor.com';
 
 // Scopes combinados para las 3 APIs que usaremos
 const API_SCOPES = 'openid dpv:FraudPreventionAndDetection2LA#number-verification dpv:FraudPreventionAndDetection#sim-swap dpv:FraudPreventionAndDetection#device-status';
