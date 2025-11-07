@@ -8,38 +8,59 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreText = document.getElementById('scoreText');
     const resetButton = document.getElementById('resetButton');
 
-    // Función para simular el llamado a tu orquestador
+    /**
+     * =============================================================
+     * FUNCIÓN REAL PARA LLAMAR AL ORQUESTADOR
+     * =============================================================
+     * Esta función reemplaza la simulación.
+     */
     async function callOrchestrator(number) {
-        // **IMPORTANTE:** Aquí es donde harías el fetch a tu ORQUESTADOR (Make/Pipedream/Cloud Function)
-        // Por ahora, simulamos una respuesta después de un tiempo
         
-        console.log(`Simulando llamada a orquestador con número: ${number}`);
-        
-        // Simulación de delay de red
-        await new Promise(resolve => setTimeout(resolve, 2000)); 
+        // Esta es la URL de TU PROPIO BACKEND (EL ORQUESTADOR)
+        // Como Vercel sirve tu index.html y tu api/ juntos desde el mismo
+        // dominio (ej: project-h-athon.vercel.app), podés usar una URL relativa.
+        // ¡Esto evita problemas de CORS!
+        const ORCHESTRATOR_URL = 'https://project-h-athon.vercel.app/api/checkpoint'; 
 
-        // --- Lógica de simulación de respuesta del orquestador ---
-        // Puedes cambiar esto para probar diferentes escenarios
-        const mockResponses = [
-            { decision: 'APROBADO', score: 95, type: 'success', message: 'Acceso seguro concedido.' },
-            { decision: 'REVISIÓN', score: 40, type: 'warning', message: 'Se requiere verificación adicional. Posible cambio de SIM.' },
-            { decision: 'BLOQUEADO', score: 5, type: 'danger', message: 'Acceso denegado por alto riesgo de fraude.' }
-        ];
+        console.log(`Llamando al orquestador real en: ${ORCHESTRATOR_URL}`);
 
-        // Elegimos una respuesta aleatoria para el demo, o una específica para ciertos números
-        let mockResult;
-        if (number.includes('111')) { // Ejemplo: Si el número tiene 111, forzamos un bloqueo
-            mockResult = mockResponses[2]; 
-        } else if (number.includes('222')) { // Si tiene 222, forzamos revisión
-            mockResult = mockResponses[1];
-            } else if (number.includes('333')) { // <-- AÑADIDO: Si tiene 333, forzamos aprobación
-            mockResult = mockResponses[0];
-        } else {
-            mockResult = mockResponses[Math.floor(Math.random() * mockResponses.length)];
+        try {
+            // Hacemos el "fetch" (POST) a nuestro backend
+            const response = await fetch(ORCHESTRATOR_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // Le mandamos el número en el body, como un JSON
+                body: JSON.stringify({
+                    numeroTelefono: number // Tu backend espera 'numeroTelefono'
+                })
+            });
+
+            // Si el backend (tu API) falla (devuelve un 400, 500, etc.)
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error devuelto por el orquestador:', errorData);
+                throw new Error(errorData.message || 'Error en el orquestador');
+            }
+
+            // Si todo sale bien (200 OK), devolvemos el JSON
+            const result = await response.json();
+            console.log('Respuesta del backend:', result); // Log para depurar
+            return result;
+
+        } catch (error) {
+            // Esto atrapa errores de red (ej: no hay internet) o el 'throw' de arriba
+            console.error('Error fatal llamando al orquestador:', error);
+            
+            // Devolvemos un objeto de error para que la UI lo muestre
+            return {
+                decision: 'ERROR',
+                score: 0,
+                type: 'danger',
+                message: 'No se pudo conectar al servidor. Revisa los logs de Vercel.'
+            };
         }
-        // --- Fin de lógica de simulación ---
-
-        return mockResult;
     }
 
     // Manejar el clic del botón de autenticación
@@ -47,7 +68,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const phoneNumber = phoneNumberInput.value.trim();
 
         if (phoneNumber === '') {
-            alert('Por favor, ingresa un número de teléfono.');
+            // ¡NO USAR ALERT! Mostramos el error en la UI.
+            authInputSection.classList.add('hidden');
+            authResultSection.classList.remove('hidden');
+            resultText.textContent = 'Por favor, ingresa un número de teléfono.';
+            scoreText.textContent = '';
+            resultBox.className = 'result-box danger'; // Aplicamos clase de error
+            resetButton.disabled = false; // Permitir resetear
+            authenticateButton.disabled = false; // Re-habilitar botón
+            phoneNumberInput.disabled = false; // Re-habilitar input
+            authenticateButton.textContent = 'Autenticar de forma segura';
             return;
         }
 
@@ -62,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         authResultSection.classList.remove('hidden');
 
 
-        // Llamar a la función que simula la comunicación con el orquestador
+        // ¡Llamar a la función REAL que acabamos de configurar!
         const result = await callOrchestrator(phoneNumber);
 
         // Mostrar el resultado
