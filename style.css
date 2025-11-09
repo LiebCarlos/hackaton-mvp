@@ -4,9 +4,9 @@
     --success-color: #28a745; /* Verde para éxito */
     --warning-color: #ffc107; /* Amarillo para revisión */
     --danger-color: #dc3545; /* Rojo para bloqueo */
-    --bg-color: #f8f9fa; /* Fondo claro */
+    --bg-color: #140033; /* Fondo claro */
     --text-color: #343a40; /* Color principal del texto */
-    --card-bg: #ffffff; /* Fondo de las tarjetas */
+    --card-bg: #19002e; /* Fondo de las tarjetas */
     --border-color: #dee2e6; /* Color de borde */
 }
 
@@ -94,7 +94,7 @@ input[type="tel"]:focus {
 
 button {
     background-color: var(--primary-color);
-    color: rgb(13, 0, 31);
+    color: rgb(226, 205, 255);
     border: none;
     padding: 1rem 1.8rem;
     border-radius: 8px;

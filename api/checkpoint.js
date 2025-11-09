@@ -48,6 +48,11 @@ async function getAccessToken(base64Credentials) {
         const data = await response.json();
         return data.access_token; // Retorna el token temporal
 
+
+
+
+
+        
     } catch (error) {
         console.error('Error fatal en getAccessToken:', error);
         throw error;
