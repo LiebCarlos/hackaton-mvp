@@ -1,3 +1,5 @@
+const VERCEL_BACK_URL = 'https://project-h-athon.vercel.app/api/checkpoint';
+
 export const COUNTRIES = [
   { code: '+54', flag: '🇦🇷', label: 'Argentina' },
   { code: '+1',  flag: '🇺🇸', label: 'Estados Unidos' },
@@ -7,7 +9,7 @@ export const COUNTRIES = [
 ]
 
 export type VerificationResult = {
-  decision: 'APROBADO' | 'REVISIÓN' | 'BLOQUEADO' | null
+  decision: 'APROBADO' | 'REVISIÓN' | 'BLOQUEADO' | 'ERROR' | null
   score: number
   message: string
   type: 'success' | 'warning' | 'danger'
@@ -33,10 +35,47 @@ export class PhoneVerificationService {
     return `${code} ${masked}${visible}`
   }
 
+  static async callOrchestrator(fullNumber: string): Promise<VerificationResult> {
+    console.log(`Llamando al orquestador real en: ${VERCEL_BACK_URL}`);
+
+    try {
+      const body = JSON.stringify({
+        numeroTelefono: fullNumber,
+      });
+
+      const response = await fetch(VERCEL_BACK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error devuelto por el orquestador:', errorData);
+        throw new Error(errorData.message || 'Error en el orquestador');
+      }
+
+      const result = await response.json();
+      console.log('Respuesta del backend:', result);
+      return result;
+    } catch (error) {
+      console.error('Error fatal llamando al orquestador:', error);
+      return {
+        decision: 'ERROR',
+        score: 0,
+        type: 'danger',
+        message: 'No se pudo conectar al servidor. Revisa los logs de Vercel.'
+      };
+    }
+  }
+
+
   /**
    * Simulates calling the orchestrator API
    */
-  static async callOrchestrator(fullNumber: string): Promise<VerificationResult> {
+  static async mockedCallOrchestrator(fullNumber: string): Promise<VerificationResult> {
     console.log(`Llamando al orquestador con número: ${fullNumber}`)
 
     // Simulación de delay de red
