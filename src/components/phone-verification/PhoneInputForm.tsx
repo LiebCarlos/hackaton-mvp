@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { CountrySelect } from '../ui/country-select'
 import { Phone, Shield, Loader2 } from 'lucide-react'
 import { COUNTRIES } from '../../services/PhoneVerificationService'
+import { useState } from 'react'
 
 interface PhoneInputFormProps {
   countryCode: string
@@ -25,8 +26,9 @@ export function PhoneInputForm({
   onPhoneNumberChange,
   onAuthenticate,
 }: PhoneInputFormProps) {
+  const [consent, setConsent] = useState(false)
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && isValid && !isLoading) {
+    if (e.key === 'Enter' && isValid && !isLoading && consent) {
       onAuthenticate()
     }
   }
@@ -92,6 +94,8 @@ export function PhoneInputForm({
             id="consent"
             className="mt-0.5 accent-primary"
             aria-label="Consentimiento de validación"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
           />
           <label htmlFor="consent" className="text-xs text-gray-400 leading-relaxed">
             Al continuar, aceptás la validación de tu dispositivo y línea para garantizar tu seguridad.
@@ -100,7 +104,7 @@ export function PhoneInputForm({
 
         <Button
           onClick={onAuthenticate}
-          disabled={!isValid || isLoading}
+          disabled={!isValid || isLoading || !consent}
           className="w-full text-base font-semibold h-12"
           aria-label="Autenticar número"
         >
