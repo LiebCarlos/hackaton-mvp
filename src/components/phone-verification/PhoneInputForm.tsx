@@ -90,8 +90,6 @@ export function PhoneInputForm({
           <input
             type="checkbox"
             id="consent"
-            checked
-            disabled
             className="mt-0.5 accent-primary"
             aria-label="Consentimiento de validación"
           />
