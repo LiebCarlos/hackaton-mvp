@@ -1,4 +1,4 @@
-const VERCEL_BACK_URL = 'https://checkpoint-pi.vercel.app//api/checkpoint';
+const VERCEL_BACK_URL = 'https://checkpoint-pi.vercel.app/api/checkpoint';
 
 export const COUNTRIES = [
   { code: '+54', flag: '🇦🇷', label: 'Argentina' },
